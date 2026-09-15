@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self' app: blob: data:;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' app: blob:;
+        style-src 'self' 'unsafe-inline' app: blob:;
+        img-src 'self' app: blob: data:;
+        font-src 'self' app: blob: data:;
+        connect-src 'self' app: blob:;
+        worker-src 'self' blob:;
+      "
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kimi Pinned Screenshot</title>
+    <style>
+      html,
+      body,
+      #app {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        /* 透明底：pin 的可见部分全部由页面自己画，窗口其余部分要透出桌面。
+           刻意不用 var() —— 见 __tests__/micro-app-html-contract.test.ts。 */
+        background: transparent;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/capture-pin-CueMQFEG.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/runtime-dom.esm-bundler-CHPHno77.js">
+    <link rel="modulepreload" crossorigin href="./assets/handles-D-_E27rZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/_plugin-vue_export-helper-BCo6x5W8.js">
+    <link rel="stylesheet" crossorigin href="./assets/capture-pin-CWAlNSBX.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

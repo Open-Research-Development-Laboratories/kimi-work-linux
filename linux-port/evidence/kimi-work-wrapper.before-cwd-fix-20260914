@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+if [ ! -x "$ROOT/electron" ]; then printf '%s\n' 'Kimi Work Electron runtime is missing.' >&2; exit 127; fi
+# Electron's stock binary sets process.defaultApp when it is invoked as a
+# development runtime.  This release is already packed (resources/app.asar),
+# so force the packaged mode that the original Daimon provider requires.
+export ELECTRON_FORCE_IS_PACKAGED="${ELECTRON_FORCE_IS_PACKAGED:-1}"
+if [ "${KIMI_ALLOW_NO_SANDBOX:-0}" != 1 ] && [ "$(stat -c '%a' "$ROOT/chrome-sandbox" 2>/dev/null || printf 0)" != 4755 ]; then
+  printf '%s\n' 'chrome-sandbox must be owned by root and mode 4755 (or set KIMI_ALLOW_NO_SANDBOX=1 for an explicitly sandboxless diagnostic run).' >&2
+  exit 78
+fi
+exec "$ROOT/electron" "$@"

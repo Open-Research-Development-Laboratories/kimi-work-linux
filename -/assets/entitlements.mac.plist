@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Electron V8 JIT 编译必需 -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <!-- 加载未签名的动态库（native modules） -->
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <!-- DYLD 环境变量（开发调试） -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+    <!-- 麦克风/音频输入：hardened runtime 下缺失时 TCC 静默拒绝，不弹授权框也不留 TCC 记录 -->
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+    <!-- 部分系统版本的 Core Audio 路径额外查这个 key -->
+    <key>com.apple.security.device.microphone</key>
+    <true/>
+    <!-- 摄像头：Info.plist 已声明 NSCameraUsageDescription（视频通话），同属 hardened runtime 门禁 -->
+    <key>com.apple.security.device.camera</key>
+    <true/>
+    <!-- Import and reveal exported Live Photos through the Photos scripting API. -->
+    <key>com.apple.security.automation.apple-events</key>
+    <true/>
+    <!-- WebAuthn Touch ID 凭据存储：仅顶层 app 使用；Developer ID 打包必须嵌入授权该
+         access group 的 distribution provisioning profile。helpers 使用 inherit plist。 -->
+    <key>keychain-access-groups</key>
+    <array>
+        <string>2J9472RW75.com.moonshot.kimichat.webauthn</string>
+    </array>
+</dict>
+</plist>

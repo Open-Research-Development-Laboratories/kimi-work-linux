@@ -1,0 +1,13 @@
+Min Browser source reference
+
+Repository: https://github.com/minbrowser/min
+Upstream commit: c92079cde045c38ab844e53501e9c5178d503a45
+License: Apache License 2.0
+
+The Workbench browser capability implementation was independently written for
+Kimi Desktop. No Min source code, brand asset, extension, filter list, public
+suffix data, HTTPS data, translation, or dependency source is included.
+
+Min was consulted only as a behavioral and architectural reference. See the
+source-tree document docs/2026-08-30-workbench-browser-capabilities/min-code-provenance.md
+for the per-area audit record.

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Kimi</title>
+    <!--
+      尽早（style 解析前）读取 URL query 的 theme，设置 data-theme，
+      让下面的 CSS 选择器直接命中目标主题，避免 FOUC。
+    -->
+    <script>
+      ;(function () {
+        try {
+          var t = new URLSearchParams(location.search).get("theme")
+          if (t === "light" || t === "dark") {
+            document.documentElement.setAttribute("data-theme", t)
+          }
+        } catch (e) {}
+      })()
+    </script>
+    <style>
+      /* ── 默认（亮色） ─────────────────────────────────── */
+      :root {
+        color-scheme: light;
+
+        --bg: #fbfaf9; /* = --Bg-GroundPC (src/@rat/kimi.css)，与 BaseWindow backgroundColor 同源，token 变更需同步 */
+        --fg: #0f0f10;
+        --fg-secondary: rgba(15, 15, 16, 0.55);
+        --fg-muted: rgba(15, 15, 16, 0.35);
+        --ring-track: rgba(15, 15, 16, 0.08);
+        --ring: #0f0f10;
+        --btn-bg: rgba(15, 15, 16, 0.05);
+        --btn-bg-hover: rgba(15, 15, 16, 0.09);
+        --btn-bg-active: rgba(15, 15, 16, 0.13);
+        --btn-border: rgba(15, 15, 16, 0.08);
+      }
+
+      /* ── 系统暗色兜底（当 main process 没注入 theme 时使用） ── */
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]) {
+          color-scheme: dark;
+
+          --bg: #181817; /* = --Bg-GroundPC dark，同上 */
+          --fg: #f5f5f7;
+          --fg-secondary: rgba(245, 245, 247, 0.56);
+          --fg-muted: rgba(245, 245, 247, 0.32);
+          --ring-track: rgba(255, 255, 255, 0.08);
+          --ring: #f5f5f7;
+          --btn-bg: rgba(255, 255, 255, 0.06);
+          --btn-bg-hover: rgba(255, 255, 255, 0.1);
+          --btn-bg-active: rgba(255, 255, 255, 0.16);
+          --btn-border: rgba(255, 255, 255, 0.08);
+        }
+      }
+
+      /* ── 显式主题（main process 通过 ?theme=xxx 注入，优先级最高） ── */
+      html[data-theme="light"] {
+        color-scheme: light;
+
+        --bg: #fbfaf9; /* = --Bg-GroundPC (src/@rat/kimi.css)，与 BaseWindow backgroundColor 同源，token 变更需同步 */
+        --fg: #0f0f10;
+        --fg-secondary: rgba(15, 15, 16, 0.55);
+        --fg-muted: rgba(15, 15, 16, 0.35);
+        --ring-track: rgba(15, 15, 16, 0.08);
+        --ring: #0f0f10;
+        --btn-bg: rgba(15, 15, 16, 0.05);
+        --btn-bg-hover: rgba(15, 15, 16, 0.09);
+        --btn-bg-active: rgba(15, 15, 16, 0.13);
+        --btn-border: rgba(15, 15, 16, 0.08);
+      }
+
+      html[data-theme="dark"] {
+        color-scheme: dark;
+
+        --bg: #181817; /* = --Bg-GroundPC dark，同上 */
+        --fg: #f5f5f7;
+        --fg-secondary: rgba(245, 245, 247, 0.56);
+        --fg-muted: rgba(245, 245, 247, 0.32);
+        --ring-track: rgba(255, 255, 255, 0.08);
+        --ring: #f5f5f7;
+        --btn-bg: rgba(255, 255, 255, 0.06);
+        --btn-bg-hover: rgba(255, 255, 255, 0.1);
+        --btn-bg-active: rgba(255, 255, 255, 0.16);
+        --btn-border: rgba(255, 255, 255, 0.08);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", Arial, sans-serif;
+        font-size: 13px;
+        line-height: 1.5;
+        letter-spacing: 0.1px;
+        user-select: none;
+        -webkit-app-region: drag;
+        /* 淡入，避免切换到 loading 时生硬 */
+        animation: fade-in 180ms ease-out;
+      }
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* ── Logo + Spinner ──────────────────────────────── */
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .logo-wordmark {
+        color: var(--fg);
+        opacity: 0.95;
+      }
+
+      .spinner-wrap {
+        position: relative;
+        width: 28px;
+        height: 28px;
+      }
+
+      .spinner {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2px solid var(--ring-track);
+        border-top-color: var(--ring);
+        animation: spin 900ms linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .tagline {
+        color: var(--fg-muted);
+        font-size: 12px;
+        font-weight: 400;
+      }
+
+      /* ── Reload 区（默认隐藏，main 触发 showReload() 后显示） ── */
+
+      .reload-section {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        max-width: 340px;
+        text-align: center;
+        animation: reload-in 240ms ease-out;
+      }
+
+      body.reload-mode .spinner-wrap,
+      body.reload-mode .tagline {
+        display: none;
+      }
+
+      body.reload-mode .reload-section {
+        display: flex;
+      }
+
+      @keyframes reload-in {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .reload-desc {
+        font-size: 13px;
+        color: var(--fg-secondary);
+        line-height: 1.6;
+      }
+
+      .retry-btn {
+        -webkit-app-region: no-drag;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 18px;
+        height: 32px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        background: var(--btn-bg);
+        border: 1px solid var(--btn-border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition:
+          background 120ms ease,
+          transform 120ms ease;
+      }
+
+      .retry-btn:hover {
+        background: var(--btn-bg-hover);
+      }
+
+      .retry-btn:active {
+        background: var(--btn-bg-active);
+        transform: scale(0.98);
+      }
+
+      .retry-icon {
+        width: 14px;
+        height: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <!-- Kimi wordmark（内联 SVG，使用 currentColor 跟随主题） -->
+      <svg
+        class="logo-wordmark"
+        width="96"
+        height="32"
+        viewBox="0 0 96 32"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-label="Kimi"
+      >
+        <path
+          d="M35.7666 31.3288C35.7666 31.6995 36.0671 32 36.4378 32H40.7424C41.1131 32 41.4137 31.6995 41.4137 31.3288V0.671211C41.4137 0.300511 41.1131 0 40.7424 0H36.4378C36.0671 0 35.7666 0.300512 35.7666 0.671211V31.3288Z"
+        />
+        <path
+          d="M90.3525 31.3288C90.3525 31.6995 90.6531 32 91.0238 32H95.3284C95.6991 32 95.9996 31.6995 95.9996 31.3288V0.671211C95.9996 0.300511 95.6991 0 95.3284 0H91.0237C90.653 0 90.3525 0.300512 90.3525 0.671211V31.3288Z"
+        />
+        <path
+          d="M73.2561 0C72.9467 0 72.6774 0.211538 72.604 0.51216L66.238 26.6122C66.132 27.0401 65.631 27.0401 65.5277 26.6122L59.159 0.512098C59.0857 0.211506 58.8203 0 58.5109 0C56.4292 0 49.849 0 47.7248 0C47.3541 0 47.0566 0.300512 47.0566 0.671211V31.3288C47.0566 31.6995 47.3572 32 47.7279 32H52.508C52.8787 32 53.1792 31.7084 53.1792 31.3377C53.1792 27.2337 53.1792 5.55383 53.1792 5.55383C53.1792 5.0387 53.7835 4.93174 53.9054 5.42716L60.2635 31.4879C60.3368 31.7885 60.6062 32 60.9156 32H70.8474C71.1568 32 71.4262 31.7885 71.4995 31.4878L77.8549 5.42998C77.9768 4.93455 78.5812 5.04152 78.5812 5.55665V31.3288C78.5812 31.6995 78.8817 32 79.2524 32H84.0325C84.4032 32 84.7037 31.6995 84.7037 31.3288V0.671211C84.7037 0.300511 84.4032 0 84.0325 0H73.2561Z"
+        />
+        <path
+          d="M15.2786 14.8372L28.2641 1.13288C28.6695 0.705109 28.3662 0 27.7769 0H21.7337C21.5546 0 21.3829 0.0715873 21.2569 0.198833L6.3736 15.2229C6.14256 15.4566 5.80103 15.2483 5.80103 14.8738V0.671211C5.80103 0.300511 5.50052 0 5.12982 0H0.671212C0.300512 0 0 0.300512 0 0.671211V31.3288C0 31.6995 0.300512 32 0.671211 32H5.12982C5.50052 32 5.80103 31.6995 5.80103 31.3288V25.2149C5.80103 25.0797 5.84874 24.9502 5.93162 24.8657L10.5247 20.1753C10.6352 20.0626 10.7884 20.0458 10.9115 20.1302L23.1966 29.4352C24.9931 30.6798 27.2804 31.4956 29.3751 31.8362C29.7699 31.9005 30.1176 31.5884 30.1176 31.1883C30.1176 29.1805 30.1176 26.9486 30.1176 25.6507C30.1176 25.3213 29.8782 25.0431 29.5562 24.9738C28.3412 24.7122 26.9907 24.2163 25.9665 23.5059L15.3313 15.5805C15.1103 15.4285 15.0827 15.0371 15.2786 14.8372Z"
+        />
+      </svg>
+
+      <div class="spinner-wrap" aria-label="loading">
+        <div class="spinner"></div>
+      </div>
+
+      <div class="tagline">Launching…</div>
+
+      <section class="reload-section" aria-live="polite">
+        <div class="reload-desc">请检查网络连接</div>
+        <button type="button" class="retry-btn" id="retry-btn">
+          <svg
+            class="retry-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="1 4 1 10 7 10" />
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+          </svg>
+          <span>重新加载</span>
+        </button>
+      </section>
+    </div>
+
+    <script>
+      // 主进程通过 executeJavaScript 调 window.__showReload() 激活 reload 态。
+      // 每次进入 reload 态都复位 retry 按钮 —— 避免：点击一次 retry 后 btn.disabled=true
+      // 被永久锁死，再次失败时用户看到按钮但点不动。
+      window.__showReload = function () {
+        document.body.classList.add("reload-mode")
+        var btn = document.getElementById("retry-btn")
+        if (btn) {
+          btn.disabled = false
+          btn.style.opacity = ""
+        }
+      }
+
+      document.getElementById("retry-btn").addEventListener("click", function () {
+        // 防重复点击（同一次 reload 态内）
+        var btn = this
+        btn.disabled = true
+        btn.style.opacity = "0.6"
+        // 通过 preload 暴露的 loadingAPI 通知主进程重载 kimiView
+        if (window.loadingAPI && typeof window.loadingAPI.retry === "function") {
+          window.loadingAPI.retry()
+        }
+      })
+    </script>
+  </body>
+</html>

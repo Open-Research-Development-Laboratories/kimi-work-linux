@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self' app: blob: data:;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' app: blob:;
+        style-src 'self' 'unsafe-inline' app: blob:;
+        img-src 'self' app: blob: data:;
+        font-src 'self' app: blob: data:;
+        connect-src 'self' app: blob:;
+        worker-src 'self' blob:;
+      "
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kimi Permission Flow</title>
+    <style>
+      html,
+      body,
+      #app {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/permission-flow-B1oCjki0.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/runtime-dom.esm-bundler-CHPHno77.js">
+    <link rel="modulepreload" crossorigin href="./assets/initial-locale-ctDnnJEB.js">
+    <link rel="modulepreload" crossorigin href="./assets/messages-BKJaao4A.js">
+    <link rel="modulepreload" crossorigin href="./assets/apply-initial-theme-BT8XnXw-.js">
+    <link rel="stylesheet" crossorigin href="./assets/permission-flow-DOc5cF81.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-BhHqw1yQ.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!--
+      CSP（3D model viewer guest — 独立 <webview> 进程）：
+      - 刻意极简：页面只有一个 viewer 容器，所有用户可见 UI（loading/进度/取消/错误）
+        都在宿主 kimi-agent 侧；这里没有 Vue、没有 i18n。
+      - script-src 'unsafe-eval' + 'wasm-unsafe-eval'：rhino3dm（.3dm 格式）的
+        Emscripten glue 初始化时会对字符串求值（实测仅 'wasm-unsafe-eval' 会抛
+        EvalError、3dm 直接进错误态），且需要 WebAssembly 实例化。与 kimi-agent.html
+        同姿态；本页可加载的脚本被 session onBeforeRequest 白名单钉死在自有 bundle
+        与 /rhino3dm/，eval 面可控。glue 脚本由 three 的 Rhino3dmLoader 拉取
+        /rhino3dm/rhino3dm.js 后塞进 blob Worker 执行（worker-src blob:）。
+      - style-src 'unsafe-inline'：three 对 canvas 写 style 属性。
+      - connect-src kimi-model:：模型字节的唯一来源（opaque token URL，主进程流式服务）；
+        ws:/wss: 供 dev HMR。session 级 onBeforeRequest 白名单（model-viewer-session.ts）
+        是更严格的第二道闸。
+      - img-src/blob/data：viewer 为内嵌纹理（fbx/glb）铸的 blob/data URL。
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self' app: blob: data:;
+        script-src 'self' app: blob: 'unsafe-eval' 'wasm-unsafe-eval';
+        style-src 'self' 'unsafe-inline' app: blob:;
+        img-src 'self' app: blob: data:;
+        font-src 'self' app: blob: data:;
+        connect-src 'self' app: blob: data: kimi-model: ws: wss:;
+        worker-src 'self' blob:;
+      "
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kimi Model Viewer</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #viewer {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/model-viewer-Zn3SmoS9.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-CFpRhwpy.js">
+    <link rel="modulepreload" crossorigin href="./assets/model-viewer-C0PXeiP2.js">
+  </head>
+  <body>
+    <div id="viewer"></div>
+  </body>
+</html>

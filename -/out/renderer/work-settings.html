@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self' app: blob: data:;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' app: blob:;
+        style-src 'self' 'unsafe-inline' app: blob:;
+        img-src 'self' app: https: http: blob: data: daimon-widget-resource:;
+        font-src 'self' app: blob: data:;
+        connect-src 'self' app: daimon-widget-resource: ws: wss: blob: https://*.ingest.us.sentry.io;
+        worker-src 'self' blob:;
+      "
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kimi Settings</title>
+    <style>
+      /* 首帧背景权威在主进程 settingsView.setBackgroundColor(--Bg-GroundPC)，本页保持透明让它透出。
+         这里绝不能声明不透明背景：kimi.css 的 dark 规则挂在 :root.dark，而该 class 要等
+         work-settings-entry.ts 的模块图求值完才加上；生产构建里 CSS 是 render-blocking <link>、
+         entry 是 defer module，两者之间必然 paint 一帧——那一帧 var(--Bg-Primary) 只能解析出 light
+         的 #ffffff，等同硬编码白底（暗色打开设置页闪白的根因）。
+         稳定态背景由根组件 .work-settings 的 --Bg-GroundPC 负责，与 view 底色同色。 */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
+        background: transparent;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/work-settings-BmR4_Y8r.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/runtime-dom.esm-bundler-CHPHno77.js">
+    <link rel="modulepreload" crossorigin href="./assets/index-Bq_McLHc.js">
+    <link rel="modulepreload" crossorigin href="./assets/initial-locale-ctDnnJEB.js">
+    <link rel="modulepreload" crossorigin href="./assets/services-FApF5ph0.js">
+    <link rel="modulepreload" crossorigin href="./assets/messages-BKJaao4A.js">
+    <link rel="modulepreload" crossorigin href="./assets/_plugin-vue_export-helper-BCo6x5W8.js">
+    <link rel="modulepreload" crossorigin href="./assets/_commonjsHelpers-CLPN-Npl.js">
+    <link rel="modulepreload" crossorigin href="./assets/zh-cn-g7fMmX3p.js">
+    <link rel="modulepreload" crossorigin href="./assets/theme-Bi0jre62.js">
+    <link rel="modulepreload" crossorigin href="./assets/i18n-C_oLDlWC.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-CwI5_7kw.js">
+    <link rel="modulepreload" crossorigin href="./assets/const-BfLbP9Zy.js">
+    <link rel="modulepreload" crossorigin href="./assets/struct_pb-M-iEyYsP.js">
+    <link rel="modulepreload" crossorigin href="./assets/attachment-markup-BGZ0BnkW.js">
+    <link rel="modulepreload" crossorigin href="./assets/pua-ref-B4TG8sti.js">
+    <link rel="modulepreload" crossorigin href="./assets/send-message-track-kVCDKMQK.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-CFpRhwpy.js">
+    <link rel="modulepreload" crossorigin href="./assets/rive-DS5tJD-s.js">
+    <link rel="modulepreload" crossorigin href="./assets/common-DW7QetXk.js">
+    <link rel="modulepreload" crossorigin href="./assets/WebbridgeExtensionLinkCopy-DUhIJ_ZQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/WebbridgeExtensionLinkModal-CgcxgOtu.js">
+    <link rel="modulepreload" crossorigin href="./assets/WebbridgeInstallModal-ConVt6QC.js">
+    <link rel="modulepreload" crossorigin href="./assets/pua-ref-display-BSPvVcoA.js">
+    <link rel="modulepreload" crossorigin href="./assets/apply-initial-theme-BT8XnXw-.js">
+    <link rel="modulepreload" crossorigin href="./assets/text-direction-BVjpqWtM.js">
+    <link rel="modulepreload" crossorigin href="./assets/desktop-claw-i18n-BMK2k9v0.js">
+    <link rel="stylesheet" crossorigin href="./assets/common-DQ7GG36Q.css">
+    <link rel="stylesheet" crossorigin href="./assets/WebbridgeExtensionLinkCopy-BAoepIFM.css">
+    <link rel="stylesheet" crossorigin href="./assets/WebbridgeExtensionLinkModal-Cfyif3V4.css">
+    <link rel="stylesheet" crossorigin href="./assets/WebbridgeInstallModal-Bj3eI2sj.css">
+    <link rel="stylesheet" crossorigin href="./assets/work-settings-DhctCepC.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-BhHqw1yQ.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

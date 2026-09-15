@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self' app: blob: data:;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' app: blob:;
+        style-src 'self' 'unsafe-inline' app: blob:;
+        img-src 'self' app: https: http: blob: data: daimon-widget-resource:;
+        font-src 'self' app: blob: data:;
+        connect-src 'self' app: daimon-widget-resource: ws: wss: blob: https://*.ingest.us.sentry.io;
+        worker-src 'self' blob:;
+      "
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kimi Settings</title>
+    <style>
+      /* 首帧背景权威在主进程 settingsView.setBackgroundColor(--Bg-GroundPC)，本页保持透明让它透出。
+         这里绝不能声明不透明背景：kimi.css 的 dark 规则挂在 :root.dark，而该 class 要等
+         work-settings-entry.ts 的模块图求值完才加上；生产构建里 CSS 是 render-blocking <link>、
+         entry 是 defer module，两者之间必然 paint 一帧——那一帧 var(--Bg-Primary) 只能解析出 light
+         的 #ffffff，等同硬编码白底（暗色打开设置页闪白的根因）。
+         稳定态背景由根组件 .work-settings 的 --Bg-GroundPC 负责，与 view 底色同色。 */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
+        background: transparent;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/work-settings-BmR4_Y8r.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/runtime-dom.esm-bundler-CHPHno77.js">
+    <link rel="modulepreload" crossorigin href="./assets/index-Bq_McLHc.js">
+    <link rel="modulepreload" crossorigin href="./assets/initial-locale-ctDnnJEB.js">
+    <link rel="modulepreload" crossorigin href="./assets/services-FApF5ph0.js">
+    <link rel="modulepreload" crossorigin href="./assets/messages-BKJaao4A.js">
+    <link rel="modulepreload" crossorigin href="./assets/_plugin-vue_export-helper-BCo6x5W8.js">
+    <link rel="modulepreload" crossorigin href="./assets/_commonjsHelpers-CLPN-Npl.js">
+    <link rel="modulepreload" crossorigin href="./assets/zh-cn-g7fMmX3p.js">
+    <link rel="modulepreload" crossorigin href="./assets/theme-Bi0jre62.js">
+    <link rel="modulepreload" crossorigin href="./assets/i18n-C_oLDlWC.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-CwI5_7kw.js">
+    <link rel="modulepreload" crossorigin href="./assets/const-BfLbP9Zy.js">
+    <link rel="modulepreload" crossorigin href="./assets/struct_pb-M-iEyYsP.js">
+    <link rel="modulepreload" crossorigin href="./assets/attachment-markup-BGZ0BnkW.js">
+    <link rel="modulepreload" crossorigin href="./assets/pua-ref-B4TG8sti.js">
+    <link rel="modulepreload" crossorigin href="./assets/send-message-track-kVCDKMQK.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-CFpRhwpy.js">
+    <link rel="modulepreload" crossorigin href="./assets/rive-DS5tJD-s.js">
+    <link rel="modulepreload" crossorigin href="./assets/common-DW7QetXk.js">
+    <link rel="modulepreload" crossorigin href="./assets/WebbridgeExtensionLinkCopy-DUhIJ_ZQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/WebbridgeExtensionLinkModal-CgcxgOtu.js">
+    <link rel="modulepreload" crossorigin href="./assets/WebbridgeInstallModal-ConVt6QC.js">
+    <link rel="modulepreload" crossorigin href="./assets/pua-ref-display-BSPvVcoA.js">
+    <link rel="modulepreload" crossorigin href="./assets/apply-initial-theme-BT8XnXw-.js">
+    <link rel="modulepreload" crossorigin href="./assets/text-direction-BVjpqWtM.js">
+    <link rel="modulepreload" crossorigin href="./assets/desktop-claw-i18n-BMK2k9v0.js">
+    <link rel="stylesheet" crossorigin href="./assets/common-DQ7GG36Q.css">
+    <link rel="stylesheet" crossorigin href="./assets/WebbridgeExtensionLinkCopy-BAoepIFM.css">
+    <link rel="stylesheet" crossorigin href="./assets/WebbridgeExtensionLinkModal-Cfyif3V4.css">
+    <link rel="stylesheet" crossorigin href="./assets/WebbridgeInstallModal-Bj3eI2sj.css">
+    <link rel="stylesheet" crossorigin href="./assets/work-settings-DhctCepC.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-BhHqw1yQ.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  <script id="kimi-custom-hotkeys-bootstrap">function __kimiMountCustomHotkeys() {
+  const api = window.clawBridgeAPI;
+  if (!api || typeof api.getCustomHotkeys !== "function") return;
+  // Do not mount into <body> before Vue has created the settings surface:
+  // work-settings.html is bootstrapped before the async renderer module and a
+  // body-level panel is clipped by the page's overflow-hidden shell.  The
+  // observer/interval below retries until the actual settings host exists.
+  const host = document.querySelector(".work-settings-pane__surface") || document.querySelector(".work-settings-pane");
+  if (!host || host.querySelector("[data-kimi-custom-hotkeys]")) return;
+  const panel = document.createElement("section");
+  panel.setAttribute("data-kimi-custom-hotkeys", "1");
+  const styleId = "kimi-custom-hotkeys-style";
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.textContent = [
+      "[data-kimi-custom-hotkeys]{margin:16px 0 24px;padding:18px;border:1px solid rgba(128,128,128,.28);border-radius:12px;background:rgba(128,128,128,.08);font:13px/1.4 system-ui,sans-serif;color:inherit}",
+      "[data-kimi-custom-hotkeys] h2{margin:0 0 4px;font-size:16px}",
+      "[data-kimi-custom-hotkeys] h3{margin:18px 0 8px;font-size:14px}",
+      "[data-kimi-custom-hotkeys] p{margin:0 0 12px;opacity:.7}",
+      ".kimi-hk-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(128,128,128,.18)}",
+      ".kimi-hk-copy{flex:1;min-width:0}.kimi-hk-label{font-weight:600}.kimi-hk-desc{display:block;opacity:.62;font-size:12px}",
+      ".kimi-hk-key{min-width:108px;padding:6px 8px;border:1px solid rgba(128,128,128,.4);border-radius:7px;background:transparent;color:inherit;text-align:center;font:12px ui-monospace,monospace}",
+      ".kimi-hk-btn{padding:6px 9px;border:1px solid rgba(128,128,128,.4);border-radius:7px;background:transparent;color:inherit;cursor:pointer}.kimi-hk-btn:hover{background:rgba(128,128,128,.16)}",
+      ".kimi-hk-btn--danger{color:#e57373}.kimi-hk-code{display:block;white-space:pre-wrap;word-break:break-word;opacity:.72;font:11px ui-monospace,monospace;margin-top:3px}",
+      ".kimi-hk-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.kimi-hk-form input,.kimi-hk-form textarea{box-sizing:border-box;width:100%;padding:7px 8px;border:1px solid rgba(128,128,128,.4);border-radius:7px;background:transparent;color:inherit;font:12px system-ui,sans-serif}.kimi-hk-form textarea{grid-column:1/-1;min-height:54px;resize:vertical}.kimi-hk-form .kimi-hk-form-actions{grid-column:1/-1;display:flex;gap:8px}.kimi-hk-status{margin-top:10px;min-height:18px;color:#e6b566}.kimi-hk-note{font-size:11px;opacity:.58;margin-top:10px}",
+    ].join("");
+    document.head.appendChild(style);
+  }
+  host.appendChild(panel);
+  let recordingLabel = null;
+  let stopProgress = typeof api.onCustomHotkeyRecordingProgress === "function" ? api.onCustomHotkeyRecordingProgress((event) => {
+    if (recordingLabel && event && event.type === "candidate") recordingLabel.textContent = event.shortcut || "Press a key…";
+  }) : () => {};
+  let disposed = false;
+  const setStatus = (message) => {
+    const node = panel.querySelector("[data-kimi-hotkey-status]");
+    if (node) node.textContent = message || "";
+  };
+  const button = (label, className, handler) => {
+    const node = document.createElement("button");
+    node.type = "button";
+    node.className = "kimi-hk-btn" + (className ? " " + className : "");
+    node.textContent = label;
+    node.addEventListener("click", () => Promise.resolve(handler(node)).catch((error) => setStatus(error?.message || String(error))));
+    return node;
+  };
+  const record = async (target, node) => {
+    recordingLabel = node;
+    node.textContent = "Press a key…";
+    setStatus("Recording a shortcut. Press the complete chord, or wait for timeout.");
+    const result = await api.recordCustomHotkey(target);
+    recordingLabel = null;
+    if (!result || !result.ok) {
+      node.textContent = "Assign";
+      setStatus(result?.message || result?.reason || "Shortcut recording failed");
+      return;
+    }
+    setStatus("Shortcut saved: " + (result.shortcut || ""));
+    await load();
+  };
+  const render = (data) => {
+    if (disposed) return;
+    panel.innerHTML = "";
+    const title = document.createElement("h2");
+    title.textContent = "Custom hotkeys";
+    panel.appendChild(title);
+    const intro = document.createElement("p");
+    intro.textContent = "Assign one global shortcut to any Kimi action, or create a command that runs locally. Conflicts are rejected before saving.";
+    panel.appendChild(intro);
+    const status = document.createElement("div");
+    status.className = "kimi-hk-status";
+    status.setAttribute("data-kimi-hotkey-status", "1");
+    const inputStatus = data?.status?.inputStatus || "unknown";
+    status.textContent = inputStatus === "running" ? "Global keyboard reader ready" : "Global keyboard reader: " + inputStatus;
+    panel.appendChild(status);
+    const actionHeading = document.createElement("h3");
+    actionHeading.textContent = "Available Kimi actions";
+    panel.appendChild(actionHeading);
+    for (const action of Array.isArray(data?.actions) ? data.actions : []) {
+      const row = document.createElement("div");
+      row.className = "kimi-hk-row";
+      const copy = document.createElement("div");
+      copy.className = "kimi-hk-copy";
+      const label = document.createElement("span");
+      label.className = "kimi-hk-label";
+      label.textContent = action.label || action.id;
+      copy.appendChild(label);
+      const desc = document.createElement("span");
+      desc.className = "kimi-hk-desc";
+      desc.textContent = action.description || action.id;
+      copy.appendChild(desc);
+      if (action.controlsExistingLauncher) {
+        const note = document.createElement("span");
+        note.className = "kimi-hk-desc";
+        note.textContent = "Updates the launcher shortcut above";
+        copy.appendChild(note);
+      }
+      row.appendChild(copy);
+      const key = document.createElement("span");
+      key.className = "kimi-hk-key";
+      key.textContent = action.enabled && action.shortcut ? action.shortcut : "Unassigned";
+      row.appendChild(key);
+      row.appendChild(button(action.enabled && action.shortcut ? "Change" : "Assign", "", (node) => record({ kind: "binding", id: action.id }, node)));
+      row.appendChild(button("Clear", "kimi-hk-btn--danger", async () => {
+        const result = await api.setCustomHotkeyBinding({ id: action.id, shortcut: "", enabled: false });
+        if (!result?.ok) return setStatus(result?.message || "Unable to clear shortcut");
+        await load();
+      }));
+      panel.appendChild(row);
+    }
+    const commandHeading = document.createElement("h3");
+    commandHeading.textContent = "Custom commands";
+    panel.appendChild(commandHeading);
+    const commands = Array.isArray(data?.commands) ? data.commands : [];
+    if (commands.length === 0) {
+      const empty = document.createElement("p");
+      empty.textContent = "No custom commands yet.";
+      panel.appendChild(empty);
+    }
+    for (const command of commands) {
+      const row = document.createElement("div");
+      row.className = "kimi-hk-row";
+      const copy = document.createElement("div");
+      copy.className = "kimi-hk-copy";
+      const label = document.createElement("span");
+      label.className = "kimi-hk-label";
+      label.textContent = command.name || command.id;
+      copy.appendChild(label);
+      const code = document.createElement("span");
+      code.className = "kimi-hk-code";
+      code.textContent = command.command || "";
+      copy.appendChild(code);
+      row.appendChild(copy);
+      const key = document.createElement("span");
+      key.className = "kimi-hk-key";
+      key.textContent = command.enabled && command.shortcut ? command.shortcut : "Unassigned";
+      row.appendChild(key);
+      row.appendChild(button(command.shortcut ? "Change" : "Assign", "", (node) => record({ kind: "command", id: command.id }, node)));
+      row.appendChild(button("Run", "", async () => {
+        const result = await api.runCustomHotkey(command.id);
+        setStatus(result?.ok ? "Command started" : (result?.message || "Command failed"));
+      }));
+      row.appendChild(button("Edit", "", () => {
+        form.elements.namedItem("id").value = command.id;
+        form.elements.namedItem("name").value = command.name || "";
+        form.elements.namedItem("command").value = command.command || "";
+        form.elements.namedItem("cwd").value = command.cwd || "";
+        form.scrollIntoView({ block: "nearest" });
+      }));
+      row.appendChild(button("Delete", "kimi-hk-btn--danger", async () => {
+        const result = await api.deleteCustomHotkeyCommand(command.id);
+        if (!result?.ok) return setStatus(result?.message || "Unable to delete command");
+        await load();
+      }));
+      panel.appendChild(row);
+    }
+    const form = document.createElement("form");
+    form.className = "kimi-hk-form";
+    form.innerHTML = '<input type="hidden" name="id"><input name="name" required maxlength="160" placeholder="Command name"><input name="cwd" maxlength="4096" placeholder="Working directory (optional)"><textarea name="command" required maxlength="8192" placeholder="Shell command, for example: notify-send Kimi"></textarea><div class="kimi-hk-form-actions"><button class="kimi-hk-btn" type="submit">Save command</button><button class="kimi-hk-btn" type="button" data-kimi-hk-reset>New command</button></div>';
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const result = await api.upsertCustomHotkeyCommand({ id: form.elements.namedItem("id").value || undefined, name: form.elements.namedItem("name").value, command: form.elements.namedItem("command").value, cwd: form.elements.namedItem("cwd").value, enabled: true });
+      if (!result?.ok) return setStatus(result?.message || "Unable to save command");
+      form.reset();
+      setStatus("Command saved. Assign a shortcut from the list above.");
+      await load();
+    });
+    form.querySelector("[data-kimi-hk-reset]").addEventListener("click", () => form.reset());
+    panel.appendChild(form);
+    const note = document.createElement("div");
+    note.className = "kimi-hk-note";
+    note.textContent = "Commands run as your user through /bin/sh with a bounded concurrency limit. Keep this list to trusted local commands.";
+    panel.appendChild(note);
+  };
+  const load = async () => {
+    try { render(await api.getCustomHotkeys()); }
+    catch (error) { setStatus(error?.message || String(error)); }
+  };
+  load();
+  window.setTimeout(() => {
+    if (disposed) return;
+    // The settings router can replace the pane without destroying this raw
+    // DOM node.  A lightweight observer keeps the panel from lingering.
+    if (!document.body.contains(panel)) { disposed = true; stopProgress?.(); }
+  }, 0);
+}
+
+(() => {
+  const mount = () => { try { __kimiMountCustomHotkeys(); } catch {} };
+  if (typeof MutationObserver === "function") new MutationObserver(mount).observe(document.documentElement, { childList: true, subtree: true });
+  window.setInterval(mount, 300);
+  mount();
+})();
+</script></body>
+</html>

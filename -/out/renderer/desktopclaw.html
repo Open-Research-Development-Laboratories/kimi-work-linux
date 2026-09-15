@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <!--
+      CSP 策略（DesktopClaw 独立应用）：
+      - app:// 协议加载本地资源
+      - ws: 允许连接本地 gateway（ws://127.0.0.1:18679）
+      - 不需要 https 外部资源（API 请求通过 main process 代理）
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self' app: blob: data:;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' app: blob:;
+        style-src 'self' 'unsafe-inline' app: blob:;
+        img-src 'self' app: https: http: blob: data:;
+        font-src 'self' app: blob: data:;
+        connect-src 'self' app: ws: wss: blob:;
+        worker-src 'self' blob:;
+      "
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kimi Claw</title>
+    <!--
+      根级重置：清掉浏览器默认 body margin: 8px（否则四周漏出 BaseWindow 底色），
+      锁死 100% 高度 + overflow: hidden（避免页面级滚动条；只让 ChatView 内部消息列表这种
+      显式可滚组件滚动）。必须 inline 在 head 里，先于 Vue 挂载，避免 FOUC。
+    -->
+    <style>
+      html,
+      body,
+      #app {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/index-Wp1jRtyJ.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-CFpRhwpy.js">
+    <link rel="modulepreload" crossorigin href="./assets/runtime-dom.esm-bundler-CHPHno77.js">
+    <link rel="modulepreload" crossorigin href="./assets/vueQueryPlugin-DZ5AFPm5.js">
+    <link rel="modulepreload" crossorigin href="./assets/index-Bq_McLHc.js">
+    <link rel="modulepreload" crossorigin href="./assets/initial-locale-ctDnnJEB.js">
+    <link rel="modulepreload" crossorigin href="./assets/messages-BKJaao4A.js">
+    <link rel="modulepreload" crossorigin href="./assets/_plugin-vue_export-helper-BCo6x5W8.js">
+    <link rel="modulepreload" crossorigin href="./assets/_commonjsHelpers-CLPN-Npl.js">
+    <link rel="modulepreload" crossorigin href="./assets/zh-cn-g7fMmX3p.js">
+    <link rel="modulepreload" crossorigin href="./assets/theme-Bi0jre62.js">
+    <link rel="modulepreload" crossorigin href="./assets/i18n-C_oLDlWC.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-CwI5_7kw.js">
+    <link rel="modulepreload" crossorigin href="./assets/const-BfLbP9Zy.js">
+    <link rel="modulepreload" crossorigin href="./assets/struct_pb-M-iEyYsP.js">
+    <link rel="modulepreload" crossorigin href="./assets/attachment-markup-BGZ0BnkW.js">
+    <link rel="modulepreload" crossorigin href="./assets/pua-ref-B4TG8sti.js">
+    <link rel="modulepreload" crossorigin href="./assets/send-message-track-kVCDKMQK.js">
+    <link rel="modulepreload" crossorigin href="./assets/rive-DS5tJD-s.js">
+    <link rel="modulepreload" crossorigin href="./assets/common-DW7QetXk.js">
+    <link rel="modulepreload" crossorigin href="./assets/dark-Bh2x5IrE.js">
+    <link rel="modulepreload" crossorigin href="./assets/light-sk_0RDjT.js">
+    <link rel="modulepreload" crossorigin href="./assets/light-BwdpK9XE.js">
+    <link rel="modulepreload" crossorigin href="./assets/text-direction-BVjpqWtM.js">
+    <link rel="stylesheet" crossorigin href="./assets/common-DQ7GG36Q.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-DtBpWGbq.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-BhHqw1yQ.css">
+  </head>
+  <body>
+    <!-- DesktopClaw Vue 应用挂载点 -->
+    <div id="app"></div>
+    <!-- DesktopClaw 独立 renderer 入口 -->
+  </body>
+</html>

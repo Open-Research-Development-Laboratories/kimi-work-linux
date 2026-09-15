@@ -1,0 +1,20 @@
+{
+  "name": "kimi-work-linux-port",
+  "private": true,
+  "version": "3.2.7",
+  "type": "module",
+  "description": "Reproducible Linux/POSIX packaging and native adapters for the Kimi Work 3.2.7 desktop bundle.",
+  "scripts": {
+    "test": "node --test test/native-adapters.test.cjs",
+    "test:chromium": "node test/chromium-webbridge-smoke.cjs",
+    "host:check": "node scripts/check-linux-host.mjs",
+    "verify:production": "KIMI_VERIFY_REQUIRE_SANDBOX=1 KIMI_VERIFY_REAL_BROWSER=1 node scripts/verify-linux.mjs",
+    "build": "node scripts/build-linux.mjs",
+    "verify": "node scripts/verify-linux.mjs"
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": []
+}

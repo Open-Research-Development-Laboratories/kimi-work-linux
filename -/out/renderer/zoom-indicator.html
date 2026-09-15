@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Zoom Indicator</title>
+    <!--
+      zoom 指示浮层（ChatGPT 同款 100% − + ｜ 重置 药丸）。
+      file:// 静态页：规避 app://localhost 的 per-host HostZoomMap——本页自身不随全局缩放。
+      结构/主题模式照 loading.html：theme 由 main 经 state 推送（每次 pulse 全量），
+      首载用 ?theme= query 防 FOUC；颜色镜像 kimi.css token（变更需同步）。
+    -->
+    <script>
+      ;(function () {
+        try {
+          var t = new URLSearchParams(location.search).get("theme")
+          if (t === "light" || t === "dark") {
+            document.documentElement.setAttribute("data-theme", t)
+          }
+        } catch (e) {}
+      })()
+    </script>
+    <style>
+      /* ── 默认（亮色）：镜像 src/@rat/kimi.css token，token 变更需同步 ── */
+      :root {
+        color-scheme: light;
+        --pill-bg: #ffffff; /* = --Bg-Primary */
+        --pill-border: rgba(15, 15, 16, 0.08); /* = --Line-Regular 系 */
+        --pill-shadow: rgba(15, 15, 16, 0.12);
+        --pill-shadow-tight: rgba(15, 15, 16, 0.05);
+        --fg: #0f0f10; /* = --Text-Primary */
+        --fg-disabled: rgba(15, 15, 16, 0.28); /* = --Text-Disabled 系 */
+        --btn-bg-hover: rgba(15, 15, 16, 0.06);
+        --btn-bg-active: rgba(15, 15, 16, 0.1);
+        --divider: rgba(15, 15, 16, 0.1);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]) {
+          color-scheme: dark;
+          --pill-bg: #2b2b2c; /* = --Bg-Primary dark 系浮层 */
+          --pill-border: rgba(255, 255, 255, 0.1);
+          --pill-shadow: rgba(0, 0, 0, 0.45);
+          --pill-shadow-tight: rgba(0, 0, 0, 0.2);
+          --fg: #f5f5f7;
+          --fg-disabled: rgba(245, 245, 247, 0.3);
+          --btn-bg-hover: rgba(255, 255, 255, 0.08);
+          --btn-bg-active: rgba(255, 255, 255, 0.14);
+          --divider: rgba(255, 255, 255, 0.12);
+        }
+      }
+
+      html[data-theme="light"] {
+        color-scheme: light;
+        --pill-bg: #ffffff;
+        --pill-border: rgba(15, 15, 16, 0.08);
+        --pill-shadow: rgba(15, 15, 16, 0.12);
+        --pill-shadow-tight: rgba(15, 15, 16, 0.05);
+        --fg: #0f0f10;
+        --fg-disabled: rgba(15, 15, 16, 0.28);
+        --btn-bg-hover: rgba(15, 15, 16, 0.06);
+        --btn-bg-active: rgba(15, 15, 16, 0.1);
+        --divider: rgba(15, 15, 16, 0.1);
+      }
+
+      html[data-theme="dark"] {
+        color-scheme: dark;
+        --pill-bg: #2b2b2c;
+        --pill-border: rgba(255, 255, 255, 0.1);
+        --pill-shadow: rgba(0, 0, 0, 0.45);
+        --pill-shadow-tight: rgba(0, 0, 0, 0.2);
+        --fg: #f5f5f7;
+        --fg-disabled: rgba(245, 245, 247, 0.3);
+        --btn-bg-hover: rgba(255, 255, 255, 0.08);
+        --btn-bg-active: rgba(255, 255, 255, 0.14);
+        --divider: rgba(255, 255, 255, 0.12);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        background: transparent;
+      }
+
+      body {
+        /* 窗口比药丸大一圈（16px 透明边），给 box-shadow 留足衰减空间；药丸贴右对齐 */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 16px;
+        user-select: none;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", Arial, sans-serif;
+      }
+
+      .pill {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        height: 36px;
+        padding: 0 6px 0 14px;
+        background: var(--pill-bg);
+        border: 1px solid var(--pill-border);
+        border-radius: 18px;
+        /* 双层阴影：近影提轮廓、远影柔和衰减（12px blur 在 16px 透明边内完整过渡） */
+        box-shadow:
+          0 1px 2px var(--pill-shadow-tight),
+          0 2px 12px var(--pill-shadow);
+        color: var(--fg);
+        font-size: 13px;
+        animation: pill-in 160ms ease-out;
+        /* 首帧占位值（100%）不展示：等 main 的首个 state 到达再显形，避免闪烁错值 */
+        visibility: hidden;
+      }
+
+      body.ready .pill {
+        visibility: visible;
+      }
+
+      @keyframes pill-in {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .percent {
+        min-width: 44px;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+        font-weight: 500;
+        margin-right: 4px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 26px;
+        min-width: 26px;
+        padding: 0 6px;
+        border: none;
+        border-radius: 13px;
+        background: transparent;
+        color: var(--fg);
+        font-family: inherit;
+        font-size: 15px;
+        cursor: pointer;
+        transition: background 120ms ease;
+      }
+
+      .btn:hover:not(:disabled) {
+        background: var(--btn-bg-hover);
+      }
+
+      .btn:active:not(:disabled) {
+        background: var(--btn-bg-active);
+      }
+
+      .btn:disabled {
+        color: var(--fg-disabled);
+        cursor: default;
+      }
+
+      .divider {
+        width: 1px;
+        height: 16px;
+        margin: 0 4px;
+        background: var(--divider);
+      }
+
+      .reset-btn {
+        font-size: 13px;
+        font-weight: 400;
+        padding: 0 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pill" role="group">
+      <span class="percent" id="percent">100%</span>
+      <button type="button" class="btn" id="zoom-out" aria-label="zoom out">−</button>
+      <button type="button" class="btn" id="zoom-in" aria-label="zoom in">+</button>
+      <span class="divider"></span>
+      <button type="button" class="btn reset-btn" id="reset">重置</button>
+    </div>
+
+    <script>
+      ;(function () {
+        var percentEl = document.getElementById("percent")
+        var pillEl = document.querySelector(".pill")
+        var zoomOutBtn = document.getElementById("zoom-out")
+        var zoomInBtn = document.getElementById("zoom-in")
+        var resetBtn = document.getElementById("reset")
+
+        function act(action) {
+          if (window.zoomIndicatorAPI && typeof window.zoomIndicatorAPI.act === "function") {
+            window.zoomIndicatorAPI.act(action)
+          }
+        }
+        zoomOutBtn.addEventListener("click", function () {
+          act("out")
+        })
+        zoomInBtn.addEventListener("click", function () {
+          act("in")
+        })
+        resetBtn.addEventListener("click", function () {
+          act("reset")
+        })
+
+        // 主进程每次 pulse 全量推送展示状态（百分比/按钮态/主题/文案）。
+        if (window.zoomIndicatorAPI && typeof window.zoomIndicatorAPI.onState === "function") {
+          window.zoomIndicatorAPI.onState(function (state) {
+            percentEl.textContent = state.percent + "%"
+            zoomOutBtn.disabled = !state.canZoomOut
+            zoomInBtn.disabled = !state.canZoomIn
+            resetBtn.disabled = !state.canReset
+            resetBtn.textContent = state.labels.reset
+            zoomInBtn.setAttribute("aria-label", state.labels.zoomIn)
+            zoomOutBtn.setAttribute("aria-label", state.labels.zoomOut)
+            pillEl.setAttribute("aria-label", state.labels.group)
+            document.documentElement.lang = state.locale
+            document.title = state.labels.group
+            document.documentElement.setAttribute("data-theme", state.theme)
+            document.body.classList.add("ready")
+          })
+        }
+      })()
+    </script>
+  </body>
+</html>

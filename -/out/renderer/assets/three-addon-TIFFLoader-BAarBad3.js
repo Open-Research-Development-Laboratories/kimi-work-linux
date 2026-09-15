@@ -1,0 +1,1 @@
+import{Z as e,u as t,g as r}from"./three-core-slqjOzyv.js";import{U as o}from"./three-addon-utif.module-DNPtuaPs.js";class s extends e{constructor(e){super(e)}parse(e){const s=o.decode(e);o.decodeImage(e,s[0]);const a=o.toRGBA8(s[0]);return{width:s[0].width,height:s[0].height,data:a,flipY:!0,magFilter:r,minFilter:t}}}export{s as T};

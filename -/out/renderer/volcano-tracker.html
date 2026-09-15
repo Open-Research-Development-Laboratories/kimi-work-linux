@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!--
+      浏览器 SDK 专用隐藏页面（无 UI，不对用户可见）。
+      承载火山 collectEvent 与同盾设备指纹 SDK；两者只共享 renderer 生命周期。
+      CSP 宽松处理：SDK 的上报链路使用 img beacon / sendBeacon / fetch 等多种方式，
+      目标域名可能随版本变化，逐个枚举不可维护。此页面无用户输入，无安全风险。
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self' app: data: blob:;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' app: blob: https://lf3-data.volccdn.com https://static.trustdecision.com;
+        connect-src *;
+        img-src * data:;
+        font-src 'self' app: data:;
+      "
+    />
+    <script type="module" crossorigin src="./assets/volcano-tracker-CuA1r79V.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/package-CwI5_7kw.js">
+  </head>
+  <body>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "builtAt": "2026-09-10T15:18:19.708Z",
+  "gitHead": "064f05274",
+  "flavor": {
+    "debug": false,
+    "pdfCompatibility": false,
+    "obfuscated": true
+  }
+}

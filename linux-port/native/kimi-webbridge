@@ -1,0 +1,57 @@
+#!/bin/sh
+set -eu
+
+# The desktop copies this launcher to ~/.kimi-webbridge/bin.  Resolve the
+# packaged release through the parent Electron executable so the copied file
+# remains relocatable and still uses the embedded Node runtime.
+ROOT="${KIMI_WEBBRIDGE_ROOT:-}"
+
+# The desktop copies this launcher to ~/.kimi-webbridge/bin.  When an
+# operator invokes that copy from a shell, PPID is the shell (not Electron),
+# so the old resolver incorrectly chose /usr/bin and reported a missing
+# /usr/bin/resources/resources/runtime/node.  Resolve the packaged tree from
+# the launcher itself first, then from a live Kimi Work process.  Every
+# candidate is accepted only when the audited embedded runtime is present.
+SELF=$(readlink -f -- "$0" 2>/dev/null || printf '%s' "$0")
+SELF_DIR=$(dirname -- "$SELF")
+if [ -z "$ROOT" ]; then
+  if [ -r "$SELF_DIR/release-root" ]; then
+    CANDIDATE=$(head -n 1 "$SELF_DIR/release-root" 2>/dev/null || true)
+    if [ -n "$CANDIDATE" ] && [ -x "$CANDIDATE/resources/resources/runtime/node" ] && [ -f "$CANDIDATE/resources/resources/kimi-webbridge-daemon.cjs" ]; then ROOT="$CANDIDATE"; fi
+  fi
+fi
+if [ -z "$ROOT" ]; then
+  for CANDIDATE in \
+    "$(readlink -f -- "$SELF_DIR/../.." 2>/dev/null || true)" \
+    "$(readlink -f -- "$SELF_DIR/../../.." 2>/dev/null || true)"; do
+    if [ -n "$CANDIDATE" ] && [ -x "$CANDIDATE/resources/resources/runtime/node" ] && [ -f "$CANDIDATE/resources/resources/kimi-webbridge-daemon.cjs" ]; then
+      ROOT="$CANDIDATE"
+      break
+    fi
+  done
+fi
+if [ -z "$ROOT" ] && [ -r "/proc/$PPID/exe" ]; then
+  ELECTRON_BIN=$(readlink -f "/proc/$PPID/exe" 2>/dev/null || true)
+  CANDIDATE=$(dirname -- "$ELECTRON_BIN")
+  if [ -x "$CANDIDATE/resources/resources/runtime/node" ] && [ -f "$CANDIDATE/resources/resources/kimi-webbridge-daemon.cjs" ]; then ROOT="$CANDIDATE"; fi
+fi
+if [ -z "$ROOT" ]; then
+  # A running desktop process is authoritative for the active release.  Do
+  # not select arbitrary historical/backup trees; the first matching process
+  # is used only when its executable has the packaged runtime and daemon.
+  for EXE in /proc/[0-9]*/exe; do
+    TARGET=$(readlink -f -- "$EXE" 2>/dev/null || true)
+    case "$TARGET" in
+      */kimi-work|*/electron)
+        CANDIDATE=$(dirname -- "$TARGET")
+        if [ -x "$CANDIDATE/resources/resources/runtime/node" ] && [ -f "$CANDIDATE/resources/resources/kimi-webbridge-daemon.cjs" ]; then ROOT="$CANDIDATE"; break; fi
+        ;;
+    esac
+  done
+fi
+[ -n "$ROOT" ] || { printf '%s\n' 'Kimi WebBridge cannot locate its packaged Linux runtime.' >&2; exit 127; }
+NODE="${KIMI_WEBBRIDGE_NODE:-$ROOT/resources/resources/runtime/node}"
+DAEMON="${KIMI_WEBBRIDGE_DAEMON:-$ROOT/resources/resources/kimi-webbridge-daemon.cjs}"
+[ -x "$NODE" ] || { printf 'Kimi WebBridge requires embedded Node: %s\n' "$NODE" >&2; exit 127; }
+[ -f "$DAEMON" ] || { printf 'Kimi WebBridge daemon payload is missing: %s\n' "$DAEMON" >&2; exit 127; }
+exec "$NODE" "$DAEMON" "$@"
