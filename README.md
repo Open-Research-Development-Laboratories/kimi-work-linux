@@ -8,14 +8,14 @@ The current release brings Kimi Work **3.2.15** to Linux with Electron **43.6.0*
 
 ## Downloads
 
-Get the latest packages from [GitHub Releases](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/tag/v3.2.15-linux.1).
+Get the latest packages from [GitHub Releases](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/tag/v3.2.15-linux.2).
 
 | Format | Download |
 | --- | --- |
-| Arch Linux | [kimi-work-linux-3.2.15-1-x86_64.pkg.tar.zst](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/download/v3.2.15-linux.1/kimi-work-linux-3.2.15-1-x86_64.pkg.tar.zst) |
-| Debian / Ubuntu | [kimi-work-linux_3.2.15_amd64.deb](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/download/v3.2.15-linux.1/kimi-work-linux_3.2.15_amd64.deb) |
-| Fedora / RPM | [kimi-work-linux-3.2.15-1.x86_64.rpm](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/download/v3.2.15-linux.1/kimi-work-linux-3.2.15-1.x86_64.rpm) |
-| Portable runtime archive | [kimi-work-linux-3.2.15-linux-x86_64.tar.zst](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/download/v3.2.15-linux.1/kimi-work-linux-3.2.15-linux-x86_64.tar.zst) |
+| Arch Linux | [kimi-work-linux-3.2.15-2-x86_64.pkg.tar.zst](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/download/v3.2.15-linux.2/kimi-work-linux-3.2.15-2-x86_64.pkg.tar.zst) |
+| Debian / Ubuntu | [kimi-work-linux_3.2.15_amd64-revision2.deb](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/download/v3.2.15-linux.2/kimi-work-linux_3.2.15_amd64-revision2.deb) |
+| Fedora / RPM | [kimi-work-linux-3.2.15-2.x86_64.rpm](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/download/v3.2.15-linux.2/kimi-work-linux-3.2.15-2.x86_64.rpm) |
+| Portable runtime archive | [kimi-work-linux-3.2.15-linux-x86_64-revision2.tar.zst](https://github.com/Open-Research-Development-Laboratories/kimi-work-linux/releases/download/v3.2.15-linux.2/kimi-work-linux-3.2.15-linux-x86_64-revision2.tar.zst) |
 
 Each package includes a detached signature. The release also includes a signed SHA256 manifest and the ORDL release signing public key.
 
@@ -26,19 +26,19 @@ Choose the native package for your distribution. Native packages install Kimi Wo
 ### Arch Linux
 
 ```sh
-sudo pacman -U ./kimi-work-linux-3.2.15-1-x86_64.pkg.tar.zst
+sudo pacman -U ./kimi-work-linux-3.2.15-2-x86_64.pkg.tar.zst
 ```
 
 ### Debian / Ubuntu
 
 ```sh
-sudo apt install ./kimi-work-linux_3.2.15_amd64.deb
+sudo apt install ./kimi-work-linux_3.2.15_amd64-revision2.deb
 ```
 
 ### Fedora / RPM
 
 ```sh
-sudo dnf install ./kimi-work-linux-3.2.15-1.x86_64.rpm
+sudo dnf install ./kimi-work-linux-3.2.15-2.x86_64.rpm
 ```
 
 Launch **Kimi Work** from your application menu or run:
@@ -57,7 +57,7 @@ Download the package, its matching `.asc` signature, and `ORDL-RELEASE-SIGNING-P
 
 ```sh
 gpg --import ORDL-RELEASE-SIGNING-PUBLIC.asc
-gpg --verify kimi-work-linux-3.2.15-1-x86_64.pkg.tar.zst.asc kimi-work-linux-3.2.15-1-x86_64.pkg.tar.zst
+gpg --verify kimi-work-linux-3.2.15-2-x86_64.pkg.tar.zst.asc kimi-work-linux-3.2.15-2-x86_64.pkg.tar.zst
 ```
 
 Replace the Arch filename with your chosen package. The ORDL release signing key fingerprint is:
@@ -66,10 +66,10 @@ Replace the Arch filename with your chosen package. The ORDL release signing key
 606B BCE1 D7B4 4959 D5C4 34F6 E41C CFC5 CB03 F0CA
 ```
 
-To check SHA256 integrity, download `KIMI-WORK-3.2.15-LINUX-SHA256SUMS` and compare your package's `sha256sum` output with its entry in the manifest. The manifest's signature can also be verified:
+To check SHA256 integrity, download `KIMI-WORK-3.2.15-REVISION2-SHA256SUMS` and compare your package's `sha256sum` output with its entry in the manifest. The manifest's signature can also be verified:
 
 ```sh
-gpg --verify KIMI-WORK-3.2.15-LINUX-SHA256SUMS.asc KIMI-WORK-3.2.15-LINUX-SHA256SUMS
+gpg --verify KIMI-WORK-3.2.15-REVISION2-SHA256SUMS.asc KIMI-WORK-3.2.15-REVISION2-SHA256SUMS
 ```
 
 ## Updates
@@ -89,6 +89,8 @@ This repository includes the shipped application JavaScript and resources, along
 The 3.2.15 release was assembled from the version-verified Kimi Work desktop payload distributed through Moonshot's official download service and the verified Electron 43.6.0 Linux runtime. The checked-in source snapshot and Linux port metadata retain their earlier version history; the published package version is 3.2.15.
 
 ## Verification
+
+Revision 2 fixes the directory permissions that prevented normal-user launch in revision 1. The installed application directory is root-owned mode `0755`, with sandbox helper mode `4755`. This remains a prerelease: a rendered window and Settings/Chat/Work navigation are not yet verified. RPM transaction checks disabled script execution; the RPM post-install hook has not been exercised on a full RPM distribution.
 
 Release checks covered all four package hashes and detached signatures, 26 native adapter tests, the WebBridge daemon smoke test, runtime syntax checks, and portable extraction. Arch and RPM packages passed isolated installation, replacement, removal, and user-data retention checks. Debian control and payload inspection passed.
 
